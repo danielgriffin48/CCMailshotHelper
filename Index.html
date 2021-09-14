@@ -3,13 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Choose file</title>
-
+    <link rel="stylesheet" href="Style.css">
 </head>
 <body>
-<form>
-    <label for="file_upload"> Choose file to upload</label>
-    <input type="file" id="file_upload">
-</form>
+<div id="mainContainer">
+    <div>
+        <h1>Contact Creator Mailshot Preparer</h1>
+        <p><b>The data you select never leaves your computer. It is not sent anywhere for processing or stored anywhere.</b></p>
+        <p>Select a contact creator file and it will get it ready for a use in a mailshot</p>
+        <ul>
+            <li>Help comply with GDPR by removing all unnecessary data</li>
+            <li>Prepare the salutation line by combining the names following the rules set by you</li>
+            <li>Alter the names of road groups to hide overly descriptive names</li>
+        </ul>
+        <form>
+            <label for="file_upload">Choose file to process</label>
+            <input type="file" id="file_upload">
+        </form>
+    </div>
+</div>
 <script src="Script.js"></script>
 </body>
 </html>
