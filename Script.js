@@ -8,6 +8,7 @@ class Person{
         this.title = title;
         this.firstName = firstName;
         this.secondName = secondName;
+        console.log(this.getTitleFirstname());
     }
 
     getTitleFirstname()
@@ -21,14 +22,47 @@ class Row{
     constructor(row)
     {
         this.row = this.splitRowToColumns(row);
-        console.log(this.row);
         this.people = this.findPeople();
-        console.log(this.people);
+        // console.log("========")
+        // console.log(this.row)
+        // console.log(this.people)
+        // console.log("========")
     }
+
+    // splitRowToColumns(row)
+    // {
+    //     //return row.split("\",\"");
+    //     for (let i =0; i<row.length; i++)
+    //     {
+    //
+    //     }
+    // }
 
     splitRowToColumns(row)
     {
-        return row.split("\",\"");
+        let first = row.split(",");
+        let final = [];
+        let start;
+        let i = 0;
+        while (i < first.length)
+        {
+            if(first[i].charAt(0) == "\"")
+            {
+                let temp = []
+                while(first[i].charAt(first[i].length-1) != "\"")
+                {
+                    temp.push(first[i])
+                    i++;
+                }
+                final.push(temp.join(""));
+
+            }
+            else {
+                final.push(first[i]);
+            }
+            i++;
+        }
+        return final;
     }
 
     findPeople()
@@ -38,14 +72,15 @@ class Row{
         for (let i = 0; i < titleColumns.length; i++)
         {
             const c = titleColumns[i];
-            if (this.row[c+1] != undefined) {
+            if (this.row[c+1] != "") {
                 people.push(new Person(this.row[c], this.row[c + 1], this.row[c + 3]));
             }
             else {
                 break;
             }
         }
-
+        console.log("found " + people.length)
+        console.log(people)
         return people;
     }
 
@@ -65,9 +100,8 @@ class Row{
     {
         if (this.people.length == 1)
         {
-            return this.people[0].getTitleFirstname();
+            return greeting + " " + this.people[0].getTitleFirstname();
         }
-        console.log(this.people);
         let salutation = new Array(this.people.length + (this.people.length-1) );
         let peeps = this.people;
         for(let i = 0; i < salutation.length; i++)
@@ -81,7 +115,7 @@ class Row{
             }
         }
         salutation[salutation.length-2] = " and "
-        return greeting + " " + salutation.join("");
+        return "\""  + greeting + " " + salutation.join("") + "\"";
     }
     getWard()
     {
@@ -135,6 +169,10 @@ function processText(text)
     for(let i = 1; i<rows.length; i++)
     {
         let temp = new Row(rows[i]);
+        if (temp.row.length != 224)
+        {
+            continue;
+        }
         //sort out salutation
         rows[i] = [temp.getSalutationTitleFirstName("Dear")];
 
@@ -147,8 +185,8 @@ function processText(text)
 
         //add full details for individuals
         rows[i].push(...temp.getFullPeopleData());
+        console.log(rows[i])
     }
-
     createDownloadFile(rows);
 }
 
@@ -156,7 +194,6 @@ function getHeaders(csvHeaderRow)
 {
     // salutation, address, people
     console.log("Generating headers");
-    console.log(csvHeaderRow);
     const headers = ["Salutation"];
 
     for(let i = 0; i < addressColumns.length; i++)
@@ -171,23 +208,14 @@ function getHeaders(csvHeaderRow)
         headers.push(csvHeaderRow[titleColumns[i]+1]);
         headers.push(csvHeaderRow[titleColumns[i]+3]);
     }
-    console.log(headers);
     return headers;
 }
 
 function createDownloadFile(data)
 {
     console.log("Preparing download");
-    data[0] = getHeaders(data[0].split("\",\""));
-
-    for(let i = 0; i < data.length; i++)
-    {
-        for (let j = 0; j < data[i].length; j++)
-        {
-            data[i][j] = "\"" + data[i][j] + "\"";
-        }
-        data[i] = data[i].join(",");
-    }
+    console.log(data);
+    data[0] = getHeaders(data[0].split(","));
 
     const csv = "data:text/csv;charset=utf-8," + data.join("\n");
     const encodedUri = encodeURI(csv);
@@ -206,3 +234,4 @@ function readFile() {
 }
 
 document.getElementById("file_upload").addEventListener("change", readFile);
+
