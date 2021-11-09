@@ -1,5 +1,3 @@
-//todo make it so that it generates a link to click
-
 const addressColumns = [8,10,11,12,13,14,15,16,17];
 const titleColumns = [32, 50, 68, 86, 104, 122, 140, 158, 176, 194, 212];
 
@@ -8,7 +6,6 @@ class Person{
         this.title = title;
         this.firstName = firstName;
         this.secondName = secondName;
-        console.log(this.getTitleFirstname());
     }
 
     getTitleFirstname()
@@ -16,53 +13,78 @@ class Person{
         //todo handle this differently when there is no title?
         return this.title + " " + this.secondName;
     }
+
+    getHaveTitle()
+    {
+        if (this.title == undefined || this.title == "")
+        {
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    getFirstNameLastName()
+    {
+        return this.firstName + " " + this.secondName;
+    }
 }
 
 class Row{
-    constructor(row)
+
+    constructor(row, allFieldsClosedByDoubleQuotes)
     {
+        this.allFieldsClosedByDoubleQuotes = allFieldsClosedByDoubleQuotes;
         this.row = this.splitRowToColumns(row);
         this.people = this.findPeople();
-        // console.log("========")
-        // console.log(this.row)
-        // console.log(this.people)
-        // console.log("========")
+        //  console.log("========");
+        //  console.log(this.row);
+        // console.log(this.people);
+        //  console.log("========");
     }
 
-    // splitRowToColumns(row)
-    // {
-    //     //return row.split("\",\"");
-    //     for (let i =0; i<row.length; i++)
-    //     {
-    //
-    //     }
-    // }
-
-    splitRowToColumns(row)
+    getAllPeopleHaveTitle()
     {
-        let first = row.split(",");
-        let final = [];
-        let start;
-        let i = 0;
-        while (i < first.length)
+        for (let i = 0; i < this.people.length ; i++)
         {
-            if(first[i].charAt(0) == "\"")
+            if (!this.people[i].getHaveTitle())
             {
-                let temp = []
-                while(first[i].charAt(first[i].length-1) != "\"")
-                {
-                    temp.push(first[i])
-                    i++;
-                }
-                final.push(temp.join(""));
-
+                return false;
             }
-            else {
-                final.push(first[i]);
-            }
-            i++;
         }
-        return final;
+        return true;
+    }
+
+    splitRowToColumns(row, allFieldsClosedByDoubleQuotes)
+    {
+        let rowSplitToColumns;
+        if (this.allFieldsClosedByDoubleQuotes)
+        {
+            rowSplitToColumns = row.split("\",\"");
+        }
+        else {
+            let first = row.split(",");
+            rowSplitToColumns = [];
+            let start;
+            let i = 0;
+            while (i < first.length) {
+                if (first[i].charAt(0) == "\"") {
+                    let temp = []
+                    while (first[i].charAt(first[i].length - 1) != "\"") {
+                        temp.push(first[i])
+                        i++;
+                    }
+                    rowSplitToColumns.push(temp.join(""));
+
+                } else {
+                    rowSplitToColumns.push(first[i]);
+                }
+                i++;
+            }
+        }
+
+        return rowSplitToColumns;
     }
 
     findPeople()
@@ -72,15 +94,15 @@ class Row{
         for (let i = 0; i < titleColumns.length; i++)
         {
             const c = titleColumns[i];
-            if (this.row[c+1] != "") {
+            if (this.row[c+1] != undefined) {
                 people.push(new Person(this.row[c], this.row[c + 1], this.row[c + 3]));
             }
             else {
                 break;
             }
         }
-        console.log("found " + people.length)
-        console.log(people)
+        // console.log("found " + people.length)
+        // console.log(people)
         return people;
     }
 
@@ -117,6 +139,29 @@ class Row{
         salutation[salutation.length-2] = " and "
         return "\""  + greeting + " " + salutation.join("") + "\"";
     }
+
+    getSalutationFirstNameSecondName(greeting)
+    {
+        if (this.people.length == 1)
+        {
+            return greeting + " " + this.people[0].getFirstNameLastName();
+        }
+        let salutation = new Array(this.people.length + (this.people.length-1) );
+        let peeps = this.people;
+        for(let i = 0; i < salutation.length; i++)
+        {
+            if (i % 2 == 0)
+            {
+                salutation[i] = peeps.shift().getFirstNameLastName();
+            }
+            else {
+                salutation[i] = ", ";
+            }
+        }
+        salutation[salutation.length-2] = " and "
+        return "\""  + greeting + " " + salutation.join("") + "\"";
+    }
+
     getWard()
     {
         return this.row[4];
@@ -160,21 +205,44 @@ class RoadGroups{
         return this.existingGroups.get(rgName);
     }
 }
-
+""
 function processText(text)
 {
     console.log("Starting to process text");
-    let rows = text.split("\n");
+    let rows = text.split(/\r\n|\n\r|\n|\r/);
+    console.log("Rows length " + rows.length);
+    // console.log("============ split rows =============")
+    // console.log(rows);
+    // console.log("============ end split rows =============")
+    let allFieldsEnclosedByQuotes;
+    if (rows[0].charAt(0) === "\"")
+    {
+        allFieldsClosedByDoubleQuotes = true;
+        console.log(rows[0].charAt(0) + " Doubled quoted");
+    }
+    else {
+        console.log(rows[0].charAt(0) + " NOT Doubled quoted");
+        allFieldsClosedByDoubleQuotes = false;
+    }
+
     const rg = new RoadGroups();
+    console.log("LEGNTH OF ROWS " + rows.length);
     for(let i = 1; i<rows.length; i++)
     {
-        let temp = new Row(rows[i]);
-        if (temp.row.length != 224)
-        {
-            continue;
-        }
+        let temp = new Row(rows[i], allFieldsClosedByDoubleQuotes);
+        // if (!allFieldsEnclosedByQuotes && temp.row.length != 224)
+        // {
+        //     continue;
+        // }
+        console.log("THE ROW IS " + temp);
+
         //sort out salutation
-        rows[i] = [temp.getSalutationTitleFirstName("Dear")];
+        if (temp.getAllPeopleHaveTitle()) {
+            rows[i] = [temp.getSalutationTitleFirstName("Dear")];
+        }
+        else {
+            rows[i] = [temp.getSalutationFirstNameSecondName("Dear")];
+        }
 
         //sort out address
         rows[i].push(...temp.getAddressBlock());
