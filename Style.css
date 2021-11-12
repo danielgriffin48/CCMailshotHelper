@@ -1,7 +1,28 @@
 body {
     font-family: sans-serif;
+    font-family: sans-serif;
+    background-color: #f1f4f7;
+    color: #003459;
 }
 #mainContainer {
     display: flex;
     justify-content: center;
+    margin-top: 3rem;
+}
+
+.firstName, .secondName, .title {
+    padding : 2px;
+    margin : 2px;
+}
+
+.firstName {
+    background-color: #BBD8BA;
+}
+
+.secondName {
+    background-color: #D9AEA9;
+}
+
+.title {
+    background-color: #D9D3BF;
 }

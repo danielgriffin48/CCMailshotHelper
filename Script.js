@@ -1,3 +1,10 @@
+/**
+ * A script to make preparing Contact Creator files for direct mails easier.
+ * It removes unnecessary data to prevent accidental disclosure, it handles combining names for greeting lines and
+ * prevents road group names from being printed.
+ *
+ */
+
 const addressColumns = [8,10,11,12,13,14,15,16,17];
 const titleColumns = [32, 50, 68, 86, 104, 122, 140, 158, 176, 194, 212];
 
@@ -10,7 +17,6 @@ class Person{
 
     getTitleFirstname()
     {
-        //todo handle this differently when there is no title?
         return this.title + " " + this.secondName;
     }
 
@@ -20,7 +26,8 @@ class Person{
         {
             return false;
         }
-        else{
+        else
+        {
             return true;
         }
     }
@@ -33,11 +40,16 @@ class Person{
 
 class Row{
 
-    constructor(row, allFieldsClosedByDoubleQuotes)
+    constructor(row, allFieldsClosedByDoubleQuotes, rg)
     {
         this.allFieldsClosedByDoubleQuotes = allFieldsClosedByDoubleQuotes;
         this.row = this.splitRowToColumns(row);
         this.people = this.findPeople();
+        this.firstNameSecondNameColumn = this.setFirstNameSecondNameColumn();
+        this.titleFirstNameSecondNameColumn = "Not implemented";
+        this.FirstNameColumn = "Not implemented";
+        this.TitleSurnameColumn = "Not implemented";
+        this.alteredRoadGroup = rg.getAlteredGroupName(this.getRoadGroup(), this.getWard())
         //  console.log("========");
         //  console.log(this.row);
         // console.log(this.people);
@@ -90,7 +102,6 @@ class Row{
     findPeople()
     {
         let people = [];
-        //const titleColumns = [32, 50, 68, 86, 104, 122, 140, 158, 176, 194, 212];
         for (let i = 0; i < titleColumns.length; i++)
         {
             const c = titleColumns[i];
@@ -101,14 +112,12 @@ class Row{
                 break;
             }
         }
-        // console.log("found " + people.length)
-        // console.log(people)
+
         return people;
     }
 
     getAddressBlock()
     {
-        //const addressColumns = [8,10,11,12,13,14,15,16,17];
         let address = []
         for(let i = 0; i < addressColumns.length; i++)
         {
@@ -185,6 +194,31 @@ class Row{
         return rowToReturn;
     }
 
+    setFirstNameSecondNameColumn()
+    {
+        if (this.getAllPeopleHaveTitle()) {
+            return this.getSalutationTitleFirstName("Dear");
+        }
+        else {
+            return this.getSalutationFirstNameSecondName("Dear");
+        }
+    }
+
+    getRowOutput()
+    {
+        let rowOutput = [ this.firstNameSecondNameColumn,
+                        this.titleFirstNameSecondNameColumn,
+                        this.FirstNameColumn,
+                        this.TitleSurnameColumn,
+                        this.getAddressBlock(),
+                        this.alteredRoadGroup,
+                        this.getRoadGroup(),
+                        this.getFullPeopleData()
+                        ];
+
+        return rowOutput;
+    }
+
 }
 
 class RoadGroups{
@@ -205,16 +239,14 @@ class RoadGroups{
         return this.existingGroups.get(rgName);
     }
 }
-""
+
+
 function processText(text)
 {
     console.log("Starting to process text");
     let rows = text.split(/\r\n|\n\r|\n|\r/);
     console.log("Rows length " + rows.length);
-    // console.log("============ split rows =============")
-    // console.log(rows);
-    // console.log("============ end split rows =============")
-    let allFieldsEnclosedByQuotes;
+
     if (rows[0].charAt(0) === "\"")
     {
         allFieldsClosedByDoubleQuotes = true;
@@ -226,33 +258,27 @@ function processText(text)
     }
 
     const rg = new RoadGroups();
-    console.log("LEGNTH OF ROWS " + rows.length);
+
     for(let i = 1; i<rows.length; i++)
     {
-        let temp = new Row(rows[i], allFieldsClosedByDoubleQuotes);
-        // if (!allFieldsEnclosedByQuotes && temp.row.length != 224)
-        // {
-        //     continue;
+        let temp = new Row(rows[i], allFieldsClosedByDoubleQuotes, rg);
+        rows[i] = temp.getRowOutput();
+        // if (temp.getAllPeopleHaveTitle()) {
+        //     rows[i] = [temp.getSalutationTitleFirstName("Dear")];
         // }
-        console.log("THE ROW IS " + temp);
-
-        //sort out salutation
-        if (temp.getAllPeopleHaveTitle()) {
-            rows[i] = [temp.getSalutationTitleFirstName("Dear")];
-        }
-        else {
-            rows[i] = [temp.getSalutationFirstNameSecondName("Dear")];
-        }
+        // else {
+        //     rows[i] = [temp.getSalutationFirstNameSecondName("Dear")];
+        // }
 
         //sort out address
-        rows[i].push(...temp.getAddressBlock());
+        // rows[i].push(...temp.getAddressBlock());
 
         //sort out road groups
-        rows[i].push(rg.getAlteredGroupName(temp.getRoadGroup(), temp.getWard()));
-        rows[i].push(temp.getRoadGroup());
+        //rows[i].push(rg.getAlteredGroupName(temp.getRoadGroup(), temp.getWard()));
+        // rows[i].push(temp.getRoadGroup());
 
         //add full details for individuals
-        rows[i].push(...temp.getFullPeopleData());
+        // rows[i].push(...temp.getFullPeopleData());
         console.log(rows[i])
     }
     createDownloadFile(rows);
@@ -262,7 +288,7 @@ function getHeaders(csvHeaderRow)
 {
     // salutation, address, people
     console.log("Generating headers");
-    const headers = ["Salutation"];
+    const headers = ["TitleSecond", "TitleFirstSecond", "First", "TitleFirst"];
 
     for(let i = 0; i < addressColumns.length; i++)
     {

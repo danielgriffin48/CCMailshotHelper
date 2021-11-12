@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Choose file</title>
+    <title>DanielGriffin.dev - Mailshot prepper</title>
     <link rel="stylesheet" href="Style.css">
 </head>
 <body>
@@ -20,6 +20,26 @@
             <label for="file_upload">Choose file to process</label>
             <input type="file" id="file_upload">
         </form>
+    </div>
+    <div>
+        <h3>Details</h3>
+        <p>This generates a series of salutation rows for direct mails.</p>
+        <div>
+            <h4>Salutations</h4>
+            Demo household :
+            <ul>
+                <li><mark class="title">Ms</mark> <mark class="firstName">Alice</mark> <mark class="secondName">Jones</mark></li>
+                <li><mark class="title">Mr</mark> <mark class="firstName">Bob</mark> <mark class="secondName">Jones</mark></li>
+                <li><mark class="title">Ms</mark> <mark class="firstName">Carol</mark> <mark class="secondName">Jacobs</mark></li>
+        </ul>
+            <ul>
+            <li>First name second name :<mark class="firstName">Alice</mark> <mark class="secondName">Jones</mark>, <mark class="firstName">Bob</mark> <mark class="secondName">Jones</mark> and <mark class="firstName">Carol</mark> <mark class="secondName">Jacobs</mark>.</li>
+            <small>Where any member of the household does not have a title, this will revert to first name, second name (see below).</small>
+            <li>Title first name second name : <mark class="title">Ms</mark> <mark class="firstName">Alice</mark> <mark class="secondName">Jones</mark>, <mark class="title">Mr</mark> <mark class="firstName">Bob</mark> <mark class="secondName">Jones</mark> and <mark class="title">Ms</mark> <mark class="firstName">Carol</mark> <mark class="secondName">Jacobs</mark>.</li>
+            <li>First name : <mark class="firstName">Alice</mark>, <mark class="firstName">Bob</mark> and <mark class="firstName">Carol</mark></li>
+            <li>Title surname : <mark class="title">Ms</mark> <mark class="secondName">Jones</mark>, <mark class="title">Mr</mark> <mark class="secondName">Jones</mark> and <mark class="title">Ms</mark> <mark class="secondName">Jacobs</mark></li>
+            </ul>
+        </div>
     </div>
 </div>
 <script src="Script.js"></script>
