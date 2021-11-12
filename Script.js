@@ -15,7 +15,7 @@ class Person{
         this.secondName = secondName;
     }
 
-    getTitleFirstname()
+    getTitleSecondName()
     {
         return this.title + " " + this.secondName;
     }
@@ -45,10 +45,10 @@ class Row{
         this.allFieldsClosedByDoubleQuotes = allFieldsClosedByDoubleQuotes;
         this.row = this.splitRowToColumns(row);
         this.people = this.findPeople();
-        this.firstNameSecondNameColumn = this.setFirstNameSecondNameColumn();
-        this.titleFirstNameSecondNameColumn = "Not implemented";
-        this.FirstNameColumn = "Not implemented";
-        this.TitleSurnameColumn = "Not implemented";
+        this.firstNameSecondNameColumn = this.getSalutationTitleSecondName("Dear");
+        this.titleFirstNameSecondNameColumn = this.getSalutationFirstNameSecondName("Dear");
+        this.FirstNameColumn = this.getSalutationFirstName("Dear");
+        this.TitleSurnameColumn = this.getSalutationTitleSurname("Dear");
         this.alteredRoadGroup = rg.getAlteredGroupName(this.getRoadGroup(), this.getWard())
         //  console.log("========");
         //  console.log(this.row);
@@ -127,19 +127,19 @@ class Row{
         return address;
     }
 
-    getSalutationTitleFirstName(greeting)
+    getSalutationTitleSecondName(greeting)
     {
         if (this.people.length == 1)
         {
-            return greeting + " " + this.people[0].getTitleFirstname();
+            return greeting + " " + this.people[0].getTitleSecondName();
         }
         let salutation = new Array(this.people.length + (this.people.length-1) );
-        let peeps = this.people;
+        let peeps = [...this.people];
         for(let i = 0; i < salutation.length; i++)
         {
             if (i % 2 == 0)
             {
-                salutation[i] = peeps.shift().getTitleFirstname();
+                salutation[i] = peeps.shift().getTitleSecondName();
             }
             else {
                 salutation[i] = ", ";
@@ -155,13 +155,62 @@ class Row{
         {
             return greeting + " " + this.people[0].getFirstNameLastName();
         }
+        // creates an array with enough space for each person plus commas and ands
         let salutation = new Array(this.people.length + (this.people.length-1) );
-        let peeps = this.people;
+        let peeps = [...this.people];
+        // loops through and either adds a comma or pops first person and takes their name
         for(let i = 0; i < salutation.length; i++)
         {
             if (i % 2 == 0)
             {
                 salutation[i] = peeps.shift().getFirstNameLastName();
+            }
+            else {
+                salutation[i] = ", ";
+            }
+        }
+        // replaces final join with and
+        salutation[salutation.length-2] = " and "
+        return "\""  + greeting + " " + salutation.join("") + "\"";
+    }
+
+    getSalutationFirstName(greeting)
+    {
+        if (this.people.length === 1)
+        {
+            return greeting + " " + this.people[0].firstName;
+        }
+        let salutation = new Array(this.people.length + (this.people.length-1) );
+        let peeps = [...this.people];
+        // loops through and either adds a comma or pops first person and takes their name
+        for(let i = 0; i < salutation.length; i++)
+        {
+            if (i % 2 == 0)
+            {
+                salutation[i] = peeps.shift().firstName;
+            }
+            else {
+                salutation[i] = ", ";
+            }
+        }
+        // replaces final join with and
+        salutation[salutation.length-2] = " and "
+        return "\""  + greeting + " " + salutation.join("") + "\"";
+    }
+
+    getSalutationTitleSurname(greeting)
+    {
+        if (this.people.length == 1)
+        {
+            return greeting + " " + this.people[0].getTitleSecondName();
+        }
+        let salutation = new Array(this.people.length + (this.people.length-1) );
+        let peeps = [...this.people];
+        for(let i = 0; i < salutation.length; i++)
+        {
+            if (i % 2 == 0)
+            {
+                salutation[i] = peeps.shift().getTitleSecondName();
             }
             else {
                 salutation[i] = ", ";
