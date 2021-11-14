@@ -1,6 +1,5 @@
 body {
     font-family: sans-serif;
-    font-family: sans-serif;
     background-color: #f1f4f7;
     color: #003459;
 }
@@ -8,6 +7,9 @@ body {
     display: flex;
     justify-content: center;
     margin-top: 3rem;
+    flex-direction: column;
+    max-width: 60%;
+    margin-left: 20%;
 }
 
 .firstName, .secondName, .title {
@@ -25,4 +27,10 @@ body {
 
 .title {
     background-color: #D9D3BF;
+}
+
+.formCon {
+    background-color: #003459;
+    color: #f1f4f7;
+    padding: 1.5rem;
 }
