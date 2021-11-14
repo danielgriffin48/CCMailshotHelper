@@ -9,4 +9,4 @@ Helps:
     * Alter the names of road groups to hide overly descriptive names
 
 
-(Try it out)[https://www.danielgriffin.dev/cc/Index.html]
+[Try it out here](https://www.danielgriffin.dev/cc/Index.html) (Requires a contact creator file)
